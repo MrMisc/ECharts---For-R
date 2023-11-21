@@ -390,3 +390,31 @@ filled_data|>group_by(groups,zone)|>
 
 
 
+
+
+#Anthrax
+library(readxl)
+anth<-read_excel("Anthrax.xlsx")
+quakes |> 
+  e_charts(long) |> 
+  e_geo(
+    boundingCoords = list(
+      c(190, -10),
+      c(180, -40)
+    )
+  ) |> 
+  e_scatter(lat, mag, stations, coord_system = "geo", name = "mag", rm_y = FALSE, rm_x = FALSE) |> # do not remove axis
+  e_data(quakes, depth) |> # use e_data to add data and/or change value on x axis
+  e_scatter(depth, mag, stations,  name = "mag & depth") |>  # plot scatter
+  e_grid(right = 40, top = 100, width = "30%") |> # adjust grid to avoid overlap
+  e_y_axis(name = "depth", min = 3.5) |> # add y axis name
+  e_x_axis(name = "magnitude") |> # add x axis name
+  e_legend(FALSE) |>  # hide legend
+  e_title("Built-in crosstalk", "Use the brush") |> # title
+  e_theme("westeros") |> # add a theme
+  e_brush() |> # add the brush
+  e_tooltip() # Add tooltips
+
+
+
+
