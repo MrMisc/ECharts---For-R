@@ -1,5 +1,6 @@
+library(tidyr)
 library(echarts4r)
-library(echarts4r.assets)
+# library(echarts4r.assets)
 library(dplyr)
 library(pandoc)
 library(rjson)
@@ -248,13 +249,13 @@ e |>
 
 
 
-
+library(tidyr)
 library(echarts4r)
 library(echarts4r.assets)
 library(dplyr)
 # setwd("E:/Outbreak_CIC_Model/")
 # extra<-read.csv("extra.csv")
-setwd("C:/Users/Victus/OneDrive/Desktop")
+setwd("E:/Outbreak_CIC_Model")
 S_<-read.csv("full.csv")
 # Rearranging the data
 S_rearranged <- S_  %>%
@@ -308,7 +309,7 @@ filled_data[is.na(filled_data$values), "values"] <- 0
 # Sort the combined data by 'groups' and 'dates'
 filled_data$zone<-replace_na(filled_data$zone,-1)
 filled_data <- filled_data[order(filled_data$groups, filled_data$dates), ]
-filled_data|>group_by(groups,zone)|>
+filled_data|>group_by(groups)|>
   e_charts(dates) |>
   e_area(values,zone,
          emphasis = list(
@@ -328,9 +329,35 @@ filled_data|>group_by(groups,zone)|>
   e_title(paste("Infection Occurrences over Time by Type"), "CIC Model | by Irshad Ul Ala")
 
 
+subset(data,zone == 2)|>e_charts(dates)|>
+  e_river(values)
 
 
 
+
+
+
+
+
+
+
+
+#Stream
+
+filled_data|>group_by(groups)|>
+  e_charts(dates) |>
+  e_river(values) |> 
+  e_tooltip()  |>
+  e_theme("westeros")|>
+  e_datazoom(
+    type = "slider",
+    toolbox = TRUE,
+    bottom = 10
+  )|>
+  e_legend(right = 5,top = 80,selector = "inverse",show=TRUE,icon = 'circle',emphasis = list(selectorLabel = list(offset = list(10,0))), align = 'right',type = "scroll",width = 10,orient = "vertical")|>
+  e_legend_unselect("marker")|>
+  e_legend_unselect("Host 0[*]")|>
+  e_title(paste("Infection Occurrences over Time by Type"), "CIC Model | by Irshad Ul Ala")
 
 
 
@@ -392,9 +419,7 @@ filled_data|>group_by(groups,zone)|>
 
 
 
-#Anthrax
-library(readxl)
-anth<-read_excel("Anthrax.xlsx")
+
 quakes |> 
   e_charts(long) |> 
   e_geo(
@@ -414,7 +439,5 @@ quakes |>
   e_theme("westeros") |> # add a theme
   e_brush() |> # add the brush
   e_tooltip() # Add tooltips
-
-
 
 
