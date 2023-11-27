@@ -64,25 +64,19 @@ df|> group_by(zone)|>ec.init(
 
 
 
-dat <- data.frame(
-  x3 = runif(16),
-  x4 = runif(16),
-  x5 = abs(runif(16)),
-  x1 = rep(2020:2023, each = 4),
-  x2 = rep(c("A", "A", "B", "B"), 4)
-) 
-
-
-p <- dat |> group_by(x1) |> ec.init(
-  tl.series= list(encode= list(x= 'x3', y= 'x5'), 
-                  symbolSize= ec.clmn(2, scale=30), 
-                  groupBy= 'x2') 
-)
 
 
 
 
-p
+
+
+
+
+
+
+
+
+
 
 
 
@@ -308,12 +302,14 @@ filled_data[is.na(filled_data$values), "values"] <- 0
 
 # Sort the combined data by 'groups' and 'dates'
 filled_data$zone<-replace_na(filled_data$zone,-1)
+
+filled_data<-read.csv("filled_data.csv")
 filled_data <- filled_data[order(filled_data$groups, filled_data$dates), ]
 filled_data|>group_by(groups)|>
   e_charts(dates) |>
-  e_area(values,zone,
+  e_area(values,
          emphasis = list(
-           focus = "self"
+           focus = "self",blurScope = 'global', label = list(distance = 20)
          )) |> 
   e_y_axis(min = 0)|>
   e_tooltip()  |>
@@ -329,8 +325,6 @@ filled_data|>group_by(groups)|>
   e_title(paste("Infection Occurrences over Time by Type"), "CIC Model | by Irshad Ul Ala")
 
 
-subset(data,zone == 2)|>e_charts(dates)|>
-  e_river(values)
 
 
 
@@ -439,5 +433,16 @@ quakes |>
   e_theme("westeros") |> # add a theme
   e_brush() |> # add the brush
   e_tooltip() # Add tooltips
+
+
+
+
+
+
+
+
+
+
+
 
 
