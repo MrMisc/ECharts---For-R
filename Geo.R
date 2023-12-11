@@ -619,3 +619,64 @@ df |> group_by(zone) |>  arrange(label) |>
           visualMap= list(dimension=4, inRange= list(symbol= "diamond", symbolSize = c(35,5)))
           ,options= list(title= NULL)  # disable preset title
   )
+
+
+
+
+
+remotes::install_github('helgasoft/echarty', force = TRUE)
+library(echarty)
+library(dplyr)
+setwd("E:")
+input<-read.csv("DirectExample.csv")
+
+listofcountries<-c("Japan","Korea","Cambodia","Bangladesh","Uzbekistan","New Caledonia","Fiji","Ireland","Denmark","Latvia","Estonia","Portugal","W. Sahara","Puerto Rico","Honduras","Papua New Guinea","New Zealand","Norway","Iceland","Greenland","Cuba","Venezuela","Panama","Algeria","Libya","Egypt","Mauritania", "Saudi Arabia", "Yemen", "Oman","Thailand","Malaysia")
+input<-rbind(input,data.frame(Country =listofcountries ,Year = rep(2005,length(listofcountries)),n = rep(0,length(listofcountries)), Deaths = rep(0,length(listofcountries)) , Cases = rep(0,length(listofcountries)), lethality = rep(0,length(listofcountries)), database_name = listofcountries, lat = rep(0,length(listofcountries)), lon = rep(0,length(listofcountries))))
+
+all_years <- data.frame(Year = unique(input$Year))
+all_countries <- data.frame(Country = unique(input$Country))
+
+template <- expand.grid(Year = all_years$Year, Country = all_countries$Country)
+
+# Merge the template dataset with the original dataset
+filled_data <- merge(template, input, by = c("Year", "Country"), all = TRUE)
+filled_data[is.na(filled_data)] <- 0  # Replace NA values with 0
+
+filled_data %>%
+  mutate(
+    pleth = lethality * 100,
+    Country = case_when(
+      Country == 'Türkiye' ~ 'Turkey',
+      Country == "China (People's Rep. of)" ~ "China",
+      Country == "Congo (Dem. Rep. of the)" ~ "Dem. Rep. Congo",
+      Country == "United States of America" ~ "United States",
+      Country == "South Sudan (Rep. of)" ~ "S. Sudan",
+      Country == "Cote D'Ivoire" ~ "Côte d'Ivoire",
+      TRUE ~ Country
+    )
+  ) %>% na.omit() |>
+  group_by(Year) |>
+  
+  ec.init(load= 'world', geo= list(roam=T), animation=F,
+          tl.series= list( type= 'map', encode= list(name= 'Country', value= 'n') ),
+          visualMap = list( text='n',
+                            inRange = list(bottom= 3, color= c('#00DDF5','#A793FF','#DB2D12'), colorLightness = c(0.9,0.45), colorSaturation = c(100,300)) ),
+          tooltip= list(formatter= ec.clmn('%@<br>Outbreak Incidents: %@<br />Lethality: %R@%', 'name', 'value', 'pleth')),
+          title = list(list(left="80%", top="1%", textStyle=list(fontSize=30, color='#11111166')), 
+                       list(text = "Outbreak incidents by year", 
+                            left = "10%", top = 10, textStyle = list(fontWeight = "normal", fontSize = 20)))
+  ) |> ec.theme("something", westeros)
+
+
+
+thing<-input %>%
+  mutate(
+    pleth = lethality * 100,
+    Country = case_when(
+      Country == 'Türkiye' ~ 'Turkey',
+      Country == "China (People's Rep. of)" ~ "China",
+      TRUE ~ Country
+    )
+  )
+
+
